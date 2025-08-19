@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/authentication.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="split left">
+            <img src="../images/logo-removebg-preview.png" alt="Company Logo" class="left-logo">
+        </div>
+        <div class="split right">
+            <div class="right-content">
+                <div class="title-container">
+                    <h1>AI Korean Restaurant Payroll System</h1>
+<p class="slogan">"Where love meets food"</p>
+                </div>
+                <div class="login-container">
+                    <!-- Display error message if credentials are wrong -->
+                <?php if (isset($error_message)): ?>
+                    <div class="error-message"><?php echo $error_message; ?></div>
+                <?php endif; ?>
+
+                <!-- Login Form -->
+                <form id="details_form" method="POST" action="">
+                    <div class="elements_in_form">
+                        <input class="detail" type="text" name="username" placeholder="Username" required>
+                    </div>
+                    <div class="elements_in_form">
+                        <input class="detail" type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="elements_in_form">
+                        <button class="btn_detail" type="submit">Login</button>
+                    </div>
+                </form>
+
+                <a href="#">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
