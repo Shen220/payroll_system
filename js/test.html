@@ -1,0 +1,78 @@
+<table border="1" cellpadding="4" cellspacing="0">
+    <tr>
+        <th>Hours</th>
+        <th>Rate</th>
+        <th>Total</th>
+    </tr>
+    <tr>
+        <td><input type="number" step="0.01" id="hours" value="8"></td>
+        <td><input type="number" step="0.01" id="rate" value="100"></td>
+        <td><span id="total_display">800.00</span></td>
+    </tr>
+</table>
+
+<br>
+
+<table border="1" cellpadding="4" cellspacing="0">
+    <tr>
+        <td>SSS</td>
+        <td><input type="number" step="0.01" id="sss" value="100"></td>
+    </tr>
+    <tr>
+        <td>PhilHealth</td>
+        <td><input type="number" step="0.01" id="philhealth" value="50"></td>
+    </tr>
+    <tr>
+        <td>Advance</td>
+        <td><input type="number" step="0.01" id="advance" value="200"></td>
+    </tr>
+    <tr>
+        <td><strong>Total Deductions</strong></td>
+        <td><span id="total_deductions_display">350.00</span></td>
+    </tr>
+</table>
+
+<br>
+
+<table border="1" cellpadding="4" cellspacing="0">
+    <tr>
+        <td><strong>Gross Pay</strong></td>
+        <td><span id="gross_pay_display">800.00</span></td>
+    </tr>
+    <tr>
+        <td><strong>Net Pay</strong></td>
+        <td><span id="net_pay_display">450.00</span></td>
+    </tr>
+</table>
+<script>
+function updateCalculations() {
+    // Get hours and rate
+    const hours = parseFloat(document.getElementById('hours').value) || 0;
+    const rate  = parseFloat(document.getElementById('rate').value) || 0;
+
+    // Calculate total (gross pay)
+    const grossPay = hours * rate;
+    document.getElementById('total_display').textContent = grossPay.toFixed(2);
+    document.getElementById('gross_pay_display').textContent = grossPay.toFixed(2);
+
+    // Get deductions
+    const sss        = parseFloat(document.getElementById('sss').value) || 0;
+    const philhealth = parseFloat(document.getElementById('philhealth').value) || 0;
+    const advance    = parseFloat(document.getElementById('advance').value) || 0;
+
+    const totalDeductions = sss + philhealth + advance;
+    document.getElementById('total_deductions_display').textContent = totalDeductions.toFixed(2);
+
+    // Net pay
+    const netPay = grossPay - totalDeductions;
+    document.getElementById('net_pay_display').textContent = netPay.toFixed(2);
+}
+
+// Listen for changes on all inputs
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', updateCalculations);
+});
+
+// Run once on page load
+updateCalculations();
+</script>

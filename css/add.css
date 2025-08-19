@@ -1,0 +1,220 @@
+body { 
+  font-family: Montserrat, sans-serif; 
+  background: #f8f9fa; 
+  padding: 30px; }
+
+input, option{
+  font-family: Montserrat, sans-serif;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+label { 
+  display: block; 
+}
+
+
+#header_h{
+  display: flex;
+  height: fit-content;
+  align-items: center;
+}
+
+#description{
+  display: flex;
+  justify-content: center;
+  margin-left: 320px;
+  text-align: center;
+}
+
+#back{
+  color: black;
+  margin-left: 260px;
+}
+
+#blank_text, select{
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+}
+
+.toggle-group {
+    display: flex;
+    gap: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.toggle-group-lodging {
+    display: flex;
+    margin-top: 20px;
+}
+
+#toggle-group-one {
+    display: flex;
+    height: 53px;
+    margin-top: 10px;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+#yes_section{
+  display: flex;
+}
+
+.toggle-group-deductions{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#sss_input{
+  height: 30px;
+}
+
+#philhealth_input{
+  height: 30px;
+}
+
+#pagibig_input{
+  height: 30px;
+}
+
+#tax_input{
+  height: 30px;
+}
+
+#others_input{
+  height: 30px;
+}
+
+#toggle-group-one-deductions{
+    display: flex; 
+    flex-direction: row; 
+    margin-top: 10px; 
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+    gap: 50px;
+}
+
+#toggle-group-one-deductions-two{
+    display: flex; 
+    flex-direction: row; 
+    margin-top: 10px; 
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+    gap: 50px;
+}
+
+#toggle-group-one-deductions-three{
+    display: flex; 
+    flex-direction: row; 
+    margin-top: 10px; 
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+    gap: 50px;
+}
+
+#toggle-group-one-deductions-four{
+    display: flex; 
+    flex-direction: row; 
+    margin-top: 10px; 
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+    gap: 50px;
+}
+
+#toggle-group-one-deductions-five{
+    display: flex; 
+    flex-direction: row; 
+    margin-top: 10px; 
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+    gap: 50px;
+}
+
+.add-input[type="text"] {
+    width: 517px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #495057;
+    margin-bottom: 6px;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.5);
+}
+
+input[type="radio"] {
+  transform: scale(1.5);
+  vertical-align: middle;
+}
+
+#addressField{
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+#address{
+  display: flex;
+  align-items: center;
+  height: 25px;
+  margin-top: 2px;
+}
+
+#submit_div{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.submit-btn {
+    color: white;
+    padding: 10px;
+    width: 950px;
+    border-radius: 4px;
+    border: 2px solid #0641fb;
+    background-color: white;
+    color: #0641fb;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0641fb;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+#parent_div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#info{
+  display: flex;
+  flex-direction: column;
+}
+
+#text_info{
+  width: 500px;
+  margin-top: 10px;
+}
