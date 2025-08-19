@@ -38,6 +38,22 @@ if (session_status() === PHP_SESSION_NONE) {
   </div>
 
   <div id="btn_actions">
+    <div class="input-group" style="width:275px;">
+      <input type="text" id="employeeSearch" class="form-control" placeholder="Search employee...">
+      <button class="btn btn-outline-secondary" id="search-btn" type="button" onclick="searchEmployee()">Search</button>
+    </div>
+    <div class="form-check form-switch perm-oncall">
+      <input class="form-check-input" type="checkbox" id="statusSwitch" 
+            onchange="toggleStatus()" <?= (isset($_GET['status']) && $_GET['status'] === 'permanent') ? 'checked' : '' ?>>
+      <label class="form-check-label" for="statusSwitch" id="statusLabel">
+        <?= (isset($_GET['status']) && $_GET['status'] === 'permanent') ? 'Permanent Employees' : 'On-Call Employees' ?>
+      </label>
+    </div>
+    <div class="icon_label">
+      <a href="/payroll-system/html/archive_html.php" id="archive_btn" class="btn btn-secondary" title="Archive Employee">
+        Archive
+      </a>
+    </div>
     <div class="icon_label">
       <button id="add_btn" onclick="loadAddEmployeeModal()" class="btn btn-primary" title="Add Employee">
         <i id="add_icon" class="fa-solid fa-user-plus"></i>
@@ -64,10 +80,10 @@ if (session_status() === PHP_SESSION_NONE) {
 </div>
 
 <div id="employeeList" class="tabcontent">
-<?php if ($result && $result->num_rows > 0): ?>
+<?php if (isset($result) && $result && $result->num_rows > 0): ?>
   <form id="employee-form">
     <input type="hidden" name="selected_ids" id="selected_ids">
-    <table class="employee_table">
+    <table class="employee_table" id="employeeTable">
       <thead>
         <tr>
           <th>ID</th>
@@ -83,16 +99,16 @@ if (session_status() === PHP_SESSION_NONE) {
       <tbody>
         <?php while($row = $result->fetch_assoc()): ?>
           <tr data-id="<?= $row['employee_id'] ?>">
-            <td><?= htmlspecialchars($row['employee_id']) ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['employee_id'])) ?></td>
             <td><?= mb_strtoupper(htmlspecialchars($row['last_name'])) ?></td>
-            <td><?= htmlspecialchars($row['first_name']) ?></td>
-            <td><?= htmlspecialchars($row['position']) ?></td>
-            <td><?= htmlspecialchars($row['status']) ?></td>
-            <td><?= $row['board_lodging'] === 'Yes' ? htmlspecialchars($row['lodging_address']) : 'No' ?></td>
-            <td><?= htmlspecialchars($row['food_allowance']) ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['first_name'])) ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['position'])) ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['status'])) ?></td>
+            <td><?= mb_strtoupper($row['board_lodging'] === 'Yes' ? htmlspecialchars($row['lodging_address']) : 'No') ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['food_allowance'])) ?></td>
             <td>
               <a href="#" class="action-edit-btn" onclick="loadEditModal(<?= $row['employee_id'] ?>)">Edit</a>
-              <a href="delete_employee.php?employee_id=<?= $row['employee_id'] ?>" class="action-delete-btn" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</a>
+              <a href="archive_employee.php?employee_id=<?= $row['employee_id'] ?>" class="action-delete-btn" onclick="return confirm('Are you sure you want to archive this employee?');">Archive</a>
             </td>
          
           </tr>
@@ -107,7 +123,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <div id="payrollInfo" class="tabcontent">
   <?php if ($result1 && $result1->num_rows > 0): ?>
-    <table class="employee_table">
+    <table class="employee_table" id="payrollTable">
       <thead>
         <tr>
            <th><input type="checkbox" id="selectAllPayslips"></th>
@@ -115,23 +131,27 @@ if (session_status() === PHP_SESSION_NONE) {
           <th>Last Name</th>
           <th>First Name</th>
           <th>Gross Pay</th>
-          <th>total_deductions</th>
+          <th>Total Deductions</th>
           <th>Net Pay</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <?php while($row = $result1->fetch_assoc()): ?>
+          <?php 
+              // Calculate payroll for this row
+              $payrollData = calculatePayroll($conn, $row['employee_id'], $row['payroll_id']); 
+          ?>
           <tr>
             <td><input type="checkbox" class="payslipCheckbox" value="<?= $row['payroll_id'] ?>"></td>
             <td><?= htmlspecialchars($row['employee_id']) ?></td>
             <td><?= mb_strtoupper(htmlspecialchars($row['last_name'])) ?></td>
-            <td><?= htmlspecialchars($row['first_name']) ?></td>
-            <td>₱ <?= isset($row['gross_pay']) ? number_format($row['gross_pay'], 2) : 'N/A' ?></td>
-            <td>₱ <?= isset($row['total_deductions']) ? number_format($row['total_deductions'], 2) : 'N/A' ?></td>
-            <td>₱ <?= isset($row['net_pay']) ? number_format($row['net_pay'], 2) : 'N/A' ?></td>
+            <td><?= mb_strtoupper(htmlspecialchars($row['first_name'])) ?></td>
+            <td>₱ <?= ($payrollData && isset($payrollData['gross_pay'])) ? number_format($payrollData['gross_pay'], 2) : 'N/A' ?></td>
+            <td>₱ <?= ($payrollData && isset($payrollData['total_deductions'])) ? number_format($payrollData['total_deductions'], 2) : 'N/A' ?></td>
+            <td>₱ <?= ($payrollData && isset($payrollData['net_pay'])) ? number_format($payrollData['net_pay'], 2) : 'N/A' ?></td>
             <td>
-                <a href="#" class="action-edit-btn" onclick="loadEditPayslipModal(<?= $row['employee_id'] ?>)">Edit</a>
+                <a href="#" class="action-edit-btn" onclick="loadEditPayslipModal(<?= $row['payroll_id'] ?>)">Edit</a>
                 <a href="#" class="action-edit-btn" onclick="loadPayslipModal(<?= $row['payroll_id'] ?>); return false;">Payslip</a>
 
             </td>
@@ -214,7 +234,39 @@ if (session_status() === PHP_SESSION_NONE) {
   </div>
 </div>
 
+<script>
+function toggleStatus() {
+    const isPermanent = document.getElementById("statusSwitch").checked;
+    const newStatus = isPermanent ? "permanent" : "on-call";
+    window.location.href = "dashboard.php?status=" + newStatus;
+}
+</script>
 
 <script src="../js/dashboard.js"></script>
+
+<script>
+function searchEmployee() {
+    const input = document.getElementById("employeeSearch").value.toLowerCase();
+
+    // 🔹 Employee List Table
+    const empRows = document.querySelectorAll("#employeeTable tbody tr");
+    empRows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+
+    // 🔹 Payroll List Table
+    const payrollRows = document.querySelectorAll("#payrollTable tbody tr");
+    payrollRows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+// 🔹 Live search while typing
+document.getElementById("employeeSearch").addEventListener("keyup", searchEmployee);
+</script>
+
+
 </body>
 </html>

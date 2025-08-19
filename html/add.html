@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Employee and Payroll Computation</title>
+</head>
+<body>
+    <h2>Employee Info + Payroll + Computation</h2>
+
+    <form method="POST" action="add.php">
+
+        <!-- Employee Info -->
+        <fieldset>
+            <legend>Employee Info</legend>
+
+            <label>Last Name:</label><br>
+            <input type="text" name="last_name" required><br><br>
+
+            <label>First Name:</label><br>
+            <input type="text" name="first_name" required><br><br>
+
+            <label>Position:</label><br>
+            <input type="text" name="position" required><br><br>
+
+            <label>Status:</label><br>
+            <select name="status" required>
+                <option value="Permanent">Permanent</option>
+                <option value="On-Call">On-Call</option>
+            </select><br><br>
+
+            <label>Board & Lodging:</label><br>
+            <select name="board_lodging" required onchange="toggleLodgingAddress(this.value)">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select><br><br>
+
+            <div id="lodging_input" style="display:none;">
+                <label>Lodging Address:</label><br>
+                <input type="text" name="lodging_address"><br><br>
+            </div>
+
+            <label>Food Allowance:</label><br>
+            <select name="food_allowance" required>
+                <option value="Full">Full</option>
+                <option value="Partial">Partial</option>
+                <option value="None">None</option>
+            </select><br><br>
+        </fieldset>
+
+        <input type="submit" value="Add Employee">
+
+    </form>
+    
+    <script>
+        function toggleLodgingAddress(value) {
+            document.getElementById("lodging_input").style.display = value === "Yes" ? "block" : "none";
+        }
+    </script>
+</body>
+</html>

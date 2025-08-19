@@ -12,19 +12,18 @@ function formatCurrency($value) {
 }
 
 $payrollId = $_GET['payroll_id'] ?? null;
-if (!$payrollId || !ctype_digit($payrollId)) {
-    die("No valid payroll ID provided.");
+if (!$payrollId) {
+    die("No ID provided.");
 }
 
-// Fetch employee info and payroll transactions
+// Fetch employee info with payroll and computation
 $query = "
 SELECT 
-    eir.*, 
-    pt.*
-FROM employee_info_and_rates eir
-INNER JOIN payroll_transactions pt 
-    ON eir.employee_id = pt.employee_id
-WHERE pt.payroll_id = ?
+  ei.*, ep.*, pc.*
+FROM employee_info ei
+LEFT JOIN employee_payroll ep ON ei.employee_id = ep.employee_id
+LEFT JOIN payroll_computation pc ON ep.payroll_id = pc.payroll_id
+WHERE ep.payroll_id = ?
 ";
 
 $stmt = $conn->prepare($query);

@@ -1,5 +1,4 @@
-
-
+// dashboard.js (append at end)
 function initPayslipEditor(container) {
     const root = container || document;
     const parseNum = v => {
@@ -272,45 +271,27 @@ document.getElementsByClassName("tablinks")[0].click();
     .catch(error => console.error("Error loading modal:", error));
   }
 
- function loadEditPayslipModal(employee_id) {
-    const modalBody = document.getElementById("editPayslipBody");
-    const modalElement = document.getElementById("editPayslipModal");
+ function loadEditPayslipModal(payroll_id) {
+  fetch(`/payroll-system/html/edit_payslip_html.php?id=${payroll_id}`, { 
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(data => {
+    const container = document.getElementById("editPayslipBody");
+    container.innerHTML = data;
 
-    modalBody.innerHTML = "Loading...";
+    // IMPORTANT: initialize event listeners for the injected content
+    if (typeof initPayslipEditor === 'function') {
+      initPayslipEditor(container);
+    }
+
+    const modalElement = document.getElementById("editPayslipModal");
     const modal = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
     modal.show();
-
-    fetch(`/payroll-system/html/add_payslip_html.php?employee_id=${employee_id}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(response => response.text())
-    .then(html => {
-        modalBody.innerHTML = html;
-
-        // Attach submit event AFTER form is injected
-        const form = modalBody.querySelector('#payslipForm');
-        if (form) {
-            form.addEventListener('submit', function(e){
-                e.preventDefault();
-                const formData = new FormData(this);
-
-                fetch('/payroll-system/html/add_payslip_html.php', { 
-                    method: 'POST', 
-                    body: formData 
-                })
-                .then(res => res.text())
-                .then(html => {
-                    modalBody.innerHTML = html;
-
-                    // Optionally, reattach event if form still exists in returned HTML
-                    const newForm = modalBody.querySelector('#payslipForm');
-                    if(newForm) loadFormSubmitListener(newForm, modalBody);
-                });
-            });
-        }
-    })
-    .catch(error => console.error("Error loading payslip modal:", error));
+  })
+  .catch(error => console.error("Error loading payslip modal:", error));
 }
+
 
 
 
@@ -359,8 +340,6 @@ function updateGenerateButtonVisibility() {
     const button = document.getElementById("generatePayslipsBtn");
     button.style.visibility = (checkedCount > 0) ? "visible" : "hidden";
 }
-
-
 
 // Watch for individual checkbox changes
 document.querySelectorAll(".payslipCheckbox").forEach(cb => {
