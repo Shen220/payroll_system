@@ -38,6 +38,7 @@ tr:hover {
   background-color: white;
   width: 800px;
   margin: 0 auto;
+  border-radius: 2%;
 }
 
 .modal-content-add{
@@ -104,56 +105,20 @@ tr:hover {
   height: auto;
   align-items: center;
   width: fit-content;
+
 }
 
 #the_text {
   font-size: 32px;
   letter-spacing: 1px;
   color: white;
-  margin-top: 10px;
 }
 
 #btn_actions{
   display: flex;
-  margin-left: 100px;
+  margin-left: 700px;
   gap: 40px;
   width: fit-content; /* Adjust width to fit content */
-}
-
-.input-group{
-  align-items: center;
-  justify-content: center;
-}
-
-#employeeSearch{
-  margin-top: 6px;
-  height: 39px;
-  font-family: "Montserrat", sans-serif;
-}
-
-#search-btn{
-  height: 40px;
-  border: solid 1 white;
-  border-left: none;
-  color: white;
-  background-color: #343a40;
-}
-
-#search-btn:hover{
-  background-color: #686f77;
-}
-
-.perm-oncall{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 250px;
-  gap: 5px;
-}
-
-.form-check-label{
-  color: white;
-  margin-left: -50px;
 }
 
 #success-alert{

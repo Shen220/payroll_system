@@ -1,99 +1,4 @@
-// dashboard.js (append at end)
-function initPayslipEditor(container) {
-    const root = container || document;
-    const parseNum = v => {
-        if (v === null || v === undefined) return 0;
-        return parseFloat(String(v).replace(/[^0-9.\-]/g, '')) || 0;
-    };
 
-    function recalcGrossNet() {
-        let gross = 0;
-        // sum category hidden inputs
-        root.querySelectorAll('.category-total-input').forEach(el => {
-            gross += parseNum(el.value);
-        });
-
-        // update gross displays and hidden
-        const grossDisplay = root.querySelector('#gross_pay_display');
-        const grossHidden = root.querySelector('#gross_pay_input');
-        if (grossDisplay) grossDisplay.textContent = '₱' + gross.toFixed(2);
-        if (grossHidden) grossHidden.value = gross.toFixed(2);
-
-        // static deductions (from hidden inputs)
-        const sss = parseNum(root.querySelector('#sss_input')?.value);
-        const philhealth = parseNum(root.querySelector('#philhealth_input')?.value);
-        const pagibig = parseNum(root.querySelector('#pagibig_input')?.value);
-
-        // editable deductions
-        const cater = parseNum(root.querySelector('#cater1_input')?.value);
-        const advance = parseNum(root.querySelector('#advance_input')?.value);
-
-        const totalDeductions = sss + philhealth + pagibig + cater + advance;
-
-        const totalDedDisplay = root.querySelector('#total_deductions_display');
-        const totalDedHidden = root.querySelector('#total_deductions_input');
-        if (totalDedDisplay) totalDedDisplay.textContent = '₱' + totalDeductions.toFixed(2);
-        if (totalDedHidden) totalDedHidden.value = totalDeductions.toFixed(2);
-
-        // net pay
-        const net = gross - totalDeductions;
-        const netDisplay = root.querySelector('#net_pay_display');
-        const netHidden = root.querySelector('#net_pay_input');
-        if (netDisplay) netDisplay.textContent = '₱' + net.toFixed(2);
-        if (netHidden) netHidden.value = net.toFixed(2);
-    }
-
-    function updateRowTotalsFromInput(input) {
-        let hoursInput, rateInput;
-        if (input.classList.contains('hours')) {
-            hoursInput = input;
-            rateInput = root.querySelector(`input[name='${input.dataset.rate}']`);
-        } else if (input.classList.contains('rate')) {
-            rateInput = input;
-            hoursInput = root.querySelector(`input[name='${input.dataset.hours}']`);
-        } else {
-            return;
-        }
-
-        const hours = parseNum(hoursInput?.value);
-        const rate = parseNum(rateInput?.value);
-        const total = hours * rate;
-
-        const totalField = input.dataset.target;
-        const display = root.querySelector(`#${totalField}_display`);
-        const hidden = root.querySelector(`#${totalField}_input`);
-
-        if (display) display.textContent = '₱' + total.toFixed(2);
-        if (hidden) hidden.value = total.toFixed(2);
-
-        // update gross & net
-        recalcGrossNet();
-    }
-
-    // attach listeners
-    const hoursAndRates = root.querySelectorAll('.hours, .rate');
-    hoursAndRates.forEach(inp => {
-        inp.removeEventListener('input', inp._payslipHandler); // defensive remove
-        inp._payslipHandler = (e) => updateRowTotalsFromInput(e.target);
-        inp.addEventListener('input', inp._payslipHandler);
-    });
-
-    // deduction inputs
-    ['#cater1_input', '#advance_input'].forEach(selector => {
-        const el = root.querySelector(selector);
-        if (el) {
-            el.removeEventListener('input', el._payslipDedHandler);
-            el._payslipDedHandler = recalcGrossNet;
-            el.addEventListener('input', el._payslipDedHandler);
-        }
-    });
-
-    // initial recalc to normalize UI
-    recalcGrossNet();
-
-    // for debugging (optional)
-    // console.log('initPayslipEditor: listeners attached', hoursAndRates.length);
-}
 const selectedRows = new Set();
 
   document.querySelectorAll('tbody tr').forEach(row => {
@@ -271,29 +176,50 @@ document.getElementsByClassName("tablinks")[0].click();
     .catch(error => console.error("Error loading modal:", error));
   }
 
- function loadEditPayslipModal(payroll_id) {
-  fetch(`/payroll-system/html/edit_payslip_html.php?id=${payroll_id}`, { 
-    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-  })
-  .then(response => response.text())
-  .then(data => {
-    const container = document.getElementById("editPayslipBody");
-    container.innerHTML = data;
-
-    // IMPORTANT: initialize event listeners for the injected content
-    if (typeof initPayslipEditor === 'function') {
-      initPayslipEditor(container);
-    }
-
+function loadEditPayslipModal(employee_id) {
+    const modalBody = document.getElementById("editPayslipBody");
     const modalElement = document.getElementById("editPayslipModal");
+
+    modalBody.innerHTML = "Loading...";
     const modal = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
     modal.show();
-  })
-  .catch(error => console.error("Error loading payslip modal:", error));
+
+    fetch(`/payroll-system/html/add_payslip_html.php?employee_id=${employee_id}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        modalBody.innerHTML = html;
+
+        // attach live computation once form loads
+        attachLiveComputation(modalBody);
+
+        // Attach submit event AFTER form is injected
+        const form = modalBody.querySelector('#payslipForm');
+        if (form) {
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch('/payroll-system/html/add_payslip_html.php', { 
+                    method: 'POST', 
+                    body: formData 
+                })
+                .then(res => res.text())
+                .then(html => {
+                    modalBody.innerHTML = html;
+
+                    // Reattach computation + form submit after reload
+                    attachLiveComputation(modalBody);
+
+                    const newForm = modalBody.querySelector('#payslipForm');
+                    if(newForm) loadFormSubmitListener(newForm, modalBody);
+                });
+            });
+        }
+    })
+    .catch(error => console.error("Error loading payslip modal:", error));
 }
-
-
-
 
   function loadAddEmployeeModal() {
     fetch('/payroll-system/html/add_html.php', {
@@ -341,6 +267,8 @@ function updateGenerateButtonVisibility() {
     button.style.visibility = (checkedCount > 0) ? "visible" : "hidden";
 }
 
+
+
 // Watch for individual checkbox changes
 document.querySelectorAll(".payslipCheckbox").forEach(cb => {
     cb.addEventListener("change", updateGenerateButtonVisibility);
@@ -351,3 +279,65 @@ document.getElementById("selectAllPayslips").addEventListener("change", updateGe
 
 // Initialize on load
 updateGenerateButtonVisibility();
+
+function attachLiveComputation(container) {
+    const totalAmountSpan = document.getElementById("total_amount");
+    const sssSpan = document.getElementById("sss");
+    const pagibigSpan = document.getElementById("pagibig");
+    const philhealthSpan = document.getElementById("philhealth");
+    const caterInput = document.getElementById("cater_deductions");
+    const advanceInput = document.getElementById("advance_deductions");
+    const totalDeductionsSpan = document.getElementById("total_deductions");
+    const netPaySpan = document.getElementById("net_pay");
+
+    function updateTotal() {
+        let total = 0;
+        container.querySelectorAll("input[data-multiplier]").forEach(input => {
+            const multiplier = parseFloat(input.dataset.multiplier) || 0;
+            const value = parseFloat(input.value) || 0;
+            total += value * multiplier;
+        });
+         // Show Gross Pay
+        totalAmountSpan.textContent = total.toFixed(2)
+           // Compute percentage deductions
+        let sss = total * 0.05;        // 5%
+        let pagibig = total * 0.02;    // 2%
+        let philhealth = total * 0.025; // 2.5%
+
+        // Get manual deductions
+        let cater = parseFloat(caterInput.value) || 0;
+        let advance = parseFloat(advanceInput.value) || 0;
+
+        // Total deductions (percentage + manual)
+        let totalDeductions = sss + pagibig + philhealth + cater + advance;
+
+
+        // Show deductions
+        sssSpan.textContent = sss.toFixed(2);
+        pagibigSpan.textContent = pagibig.toFixed(2);
+        philhealthSpan.textContent = philhealth.toFixed(2);
+        totalDeductionsSpan.textContent = totalDeductions.toFixed(2);  
+
+        // Compute Net Pay
+        let netPay = total - totalDeductions;
+        netPaySpan.textContent = netPay.toFixed(2);
+    }
+  // attach listeners for computed fields
+    container.querySelectorAll("input[data-multiplier]").forEach(input => {
+        const multiplier = parseFloat(input.dataset.multiplier) || 0;
+        const resultSpan = container.querySelector("#result_" + input.id.split("input_")[1]);
+
+        input.addEventListener("input", () => {
+            let value = parseFloat(input.value) || 0;
+            let product = value * multiplier;
+            resultSpan.textContent = product.toFixed(2);
+            updateTotal();
+        });
+    });
+
+    // attach listeners for manual deductions
+    caterInput.addEventListener("input", updateTotal);
+    advanceInput.addEventListener("input", updateTotal);
+
+    updateTotal(); // run once on load
+}

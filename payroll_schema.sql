@@ -72,6 +72,7 @@ CREATE TABLE payroll_transactions (
 );
 
 CREATE TABLE archived_employees (
+    year INT NOT NULL,  -- stores the chosen year
     employee_id INT PRIMARY KEY,    
     payroll_id INT,
     last_name VARCHAR(20) NOT NULL,
@@ -90,10 +91,22 @@ CREATE TABLE archived_employees (
     rate_7_special_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 99.29,
     rate_8_regular_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 152.75,
     rate_9_cater DECIMAL(10, 2) DEFAULT 1000.00,
+    num_of_days_for_rate_1 INT UNSIGNED DEFAULT 0,
+    num_of_days_for_rate_2 INT UNSIGNED DEFAULT 0,
+    num_of_days_for_rate_3 INT UNSIGNED DEFAULT 0,
+    num_of_days_for_rate_4 INT UNSIGNED DEFAULT 0,
+    num_of_hours_for_rate_5 INT UNSIGNED DEFAULT 0,
+    num_of_hours_for_rate_6 INT UNSIGNED DEFAULT 0,
+    num_of_hours_for_rate_7 INT UNSIGNED DEFAULT 0,
+    num_of_hours_for_rate_8 INT UNSIGNED DEFAULT 0,
+    num_of_days_for_rate_9 INT UNSIGNED DEFAULT 0,
+    cater_deductions DECIMAL(10,2) DEFAULT 0.00,
+    advance_deductions DECIMAL(10,2) DEFAULT 0.00,
     deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE payslip_history (
+    year INT NOT NULL,  -- stores the chosen year
     employee_id INT PRIMARY KEY,    
     payroll_id INT,
     last_name VARCHAR(20) NOT NULL,
@@ -123,4 +136,5 @@ CREATE TABLE payslip_history (
     num_of_days_for_rate_9 INT UNSIGNED DEFAULT 0,
     cater_deductions DECIMAL(10,2) DEFAULT 0.00,
     advance_deductions DECIMAL(10,2) DEFAULT 0.00
+    
 );

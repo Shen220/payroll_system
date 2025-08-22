@@ -1,13 +1,14 @@
 <?php
-include 'db.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+session_start();
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: authentication.php");
+    exit();
 }
 
-// Check if the form was submitted using POST method.
+include('db.php');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    //Employee Info
+    // Employee Info
     $last_name = filter_var($_POST['last_name']);
     $first_name = filter_var($_POST['first_name']);
     $position = filter_var($_POST['position']);
@@ -15,84 +16,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $board_lodging = filter_var($_POST['board_lodging']);
     $lodging_address = isset($_POST['lodging_address']) ? filter_var($_POST['lodging_address']) : NULL;
     $food_allowance = filter_var($_POST['food_allowance']);
-    //Employee Rates
-    $w1_daily_minimum_wage = filter_var($_POST['w1_daily_minimum_wage']);
-    $w2_sunday_rest_day = filter_var($_POST['w2_sunday_rest_day']);
-    $w3_legal_holiday = filter_var($_POST['w3_legal_holiday']);
-    $w4_special_holiday = filter_var($_POST['w4_special_holiday']);
-    $w5_regular_overtime_perhour = filter_var($_POST['w5_regular_overtime_perhour']);
-    $w6_special_overtime_perhour = filter_var($_POST['w6_special_overtime_perhour']);
-    $w7_special_holiday_overtime_perhour = filter_var($_POST['w7_special_holiday_overtime_perhour']);
-    $w8_regular_holiday_overtime_perhour = filter_var($_POST['w8_regular_holiday_overtime_perhour']);
-    $w9_cater = filter_var($_POST['w9_cater']);
-        
+
+    // Employee Rates
+    $rate_1 = filter_var($_POST['rate_1_daily_minimum_wage']);
+    $rate_2 = filter_var($_POST['rate_2_sunday_rest_day']);
+    $rate_3 = filter_var($_POST['rate_3_legal_holiday']);
+    $rate_4 = filter_var($_POST['rate_4_special_holiday']);
+    $rate_5 = filter_var($_POST['rate_5_regular_overtime_perhour']);
+    $rate_6 = filter_var($_POST['rate_6_special_overtime_perhour']);
+    $rate_7 = filter_var($_POST['rate_7_special_holiday_overtime_perhour']);
+    $rate_8 = filter_var($_POST['rate_8_regular_holiday_overtime_perhour']);
+    $rate_9 = filter_var($_POST['rate_9_cater']);
+
     try {
-        //Insert into employee_info
-        $stmt_info = $conn->prepare("INSERT INTO employee_info (last_name, first_name, position, status, board_lodging, lodging_address, food_allowance) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt_info === false) {
-            throw new mysqli_sql_exception("Prepare statement for employee_info failed: " . $conn->error);
-        }
-        $stmt_info->bind_param("sssssss", $last_name, $first_name, $position, $status, $board_lodging, $lodging_address, $food_allowance);
-        $stmt_info->execute();
-        $employee_id = $stmt_info->insert_id;
-        $stmt_info->close();
+        $stmt = $conn->prepare("
+            INSERT INTO employee_info_and_rates (
+                last_name, first_name, position, status, board_lodging, lodging_address, food_allowance,
+                rate_1_daily_minimum_wage,
+                rate_2_sunday_rest_day,
+                rate_3_legal_holiday,
+                rate_4_special_holiday,
+                rate_5_regular_overtime_perhour,
+                rate_6_special_overtime_perhour,
+                rate_7_special_holiday_overtime_perhour,
+                rate_8_regular_holiday_overtime_perhour,
+                rate_9_cater
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
 
-        //Insert into employee_payroll
-        $stmt_payroll = $conn->prepare("
-        INSERT INTO employee_payroll (
-                employee_id, 
-                w1_daily_minimum_wage, 
-                w2_sunday_rest_day, 
-                w3_legal_holiday, 
-                w4_special_holiday, 
-                w5_regular_overtime_perhour, 
-                w6_special_overtime_perhour, 
-                w7_special_holiday_overtime_perhour, 
-                w8_regular_holiday_overtime_perhour, 
-                w9_cater
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt_payroll === false) {
-            throw new mysqli_sql_exception("Prepare statement for employee_payroll failed: " . $conn->error);
+        if ($stmt === false) {
+            throw new mysqli_sql_exception("Prepare failed: " . $conn->error);
         }
-        
-        $stmt_payroll->bind_param(
-        "iddddddddd",
-        $employee_id,
-        $w1_daily_minimum_wage,
-        $w2_sunday_rest_day,
-        $w3_legal_holiday,
-        $w4_special_holiday,
-        $w5_regular_overtime_perhour,
-        $w6_special_overtime_perhour,
-        $w7_special_holiday_overtime_perhour,
-        $w8_regular_holiday_overtime_perhour,
-        $w9_cater
-    );
 
-        $stmt_payroll->execute();
-        $payroll_id = $stmt_payroll->insert_id;
-        $stmt_payroll->close();
-        
-        //Insert into payroll_computation with default 0 values
-        $stmt_computation = $conn->prepare("INSERT INTO payroll_computation (payroll_id, employee_id) VALUES (?, ?)");
-        if ($stmt_computation === false) {
-            throw new mysqli_sql_exception("Prepare statement for payroll_computation failed: " . $conn->error);
-        }
-        $stmt_computation->bind_param("ii", $payroll_id, $employee_id);
-        $stmt_computation->execute();
-        $stmt_computation->close();
+        $stmt->bind_param(
+            "sssssssddddddddd",
+            $last_name,
+            $first_name,
+            $position,
+            $status,
+            $board_lodging,
+            $lodging_address,
+            $food_allowance,
+            $rate_1,
+            $rate_2,
+            $rate_3,
+            $rate_4,
+            $rate_5,
+            $rate_6,
+            $rate_7,
+            $rate_8,
+            $rate_9
+        );
 
-        // Set a success message and redirect.
+        $stmt->execute();
+        $stmt->close();
+
         $_SESSION['success'] = "Employee added successfully!";
         header("Location: dashboard.php");
         exit();
 
     } catch (mysqli_sql_exception $e) {
-        // Handle database errors gracefully.
         die("Database error: " . $e->getMessage());
     }
 }
 
 $conn->close();
-include '../html/edit_employee_html.php';
+include '../html/add_html.php';
 ?>

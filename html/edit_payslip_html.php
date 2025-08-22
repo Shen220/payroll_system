@@ -1,134 +1,100 @@
 <?php
-// Assuming this is called via AJAX
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once('../php/db.php'); // Make sure DB connection is available
+include '../php/db.php';
+// Small helper for safe escaping
+function h($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Payslip</title>
+    <link rel="stylesheet" href="../css/edit_payslip.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2>Edit Payslip</h2>
 
-<link rel="stylesheet" href="../css/edit_payslip.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- Employee info (read-only) -->
+    <div class="employee-info">
+        <h3>Employee Information</h3>
+        <p><strong>Name:</strong>
+            <?= h(trim(($employee['first_name'] ?? '') . ' ' . ($employee['last_name'] ?? ''))) ?></p>
+        <p><strong>Position:</strong> <?= h($employee['position'] ?? '') ?></p>
+        <p><strong>Status:</strong> <?= h($employee['status'] ?? '') ?></p>
+        <p><strong>Food Allowance:</strong> <?= h($employee['food_allowance'] ?? '0') ?></p>
+        <p><strong>Board & Lodging:</strong> <?= h($employee['board_lodging'] ?? '') ?></p>
+        <p><strong>Lodging Address:</strong> <?= h($employee['lodging_address'] ?? '') ?></p>
+    </div>
 
-<?php
-$payrollId = $_GET['id'] ?? null;
-$successMessage = '';
-$errorMessage = '';
+    <!-- Payroll week info -->
+    <div class="payroll-info">
+        <h3>Payroll Period</h3>
+        <p><strong>Week:</strong> <?= h($payroll['week'] ?? '') ?></p>
+    </div>
 
-if ($payrollId) {
-    $stmt = $conn->prepare("
-        SELECT ei.*, pd.*
-        FROM employee_info_and_rates ei
-        LEFT JOIN payroll_dates pd ON ei.employee_id = ei.employee_id
-        WHERE ei.employee_id = ?
-    ");
-    $stmt->bind_param("i", $payrollId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $value = $result->fetch_assoc();
-    $stmt->close();
-} else {
-    echo "Payroll ID not provided.";
-    exit;
-}
+    <!-- Editable fields: days/hours/deductions -->
+    <form action="../php/edit_payslip.php" method="POST">
+        <input type="hidden" name="employee_id" value="<?= h($employee['employee_id'] ?? '') ?>">
+        <input type="hidden" name="payroll_id" value="<?= h($payroll['payroll_id'] ?? '') ?>">
 
-function formatCurrency($amount) {
-    return '₱' . number_format($amount, 2);
-}
-?>
-
-<div class="payslip-modal-payslip-editor">
-
-    <?php if ($successMessage): ?>
-        <p class="payslip-success"><?= $successMessage ?></p>
-    <?php endif; ?>
-    <?php if ($errorMessage): ?>
-        <p class="payslip-error"><?= $errorMessage ?></p>
-    <?php endif; ?>
-
-    <form method="post" action="../php/edit_payslip.php" class="payslip-edit-payslip-form">
-        <input type="hidden" name="payroll_id" value="<?= $payrollId ?>">
-
-        <div class="payslip-for-style">
-            <p>Date: <?= date("F j, Y") ?></p>
-            <h7 id="ppayslip-text">AI Korean Buffet Restaurant</h7>
-            <h7 id="ppayslip-text-special">MH del pilar Burnham Legarda road, Baguio City, Philippines</h7>
-        </div>
-        <div class="payslip-third_container">
-            <div>
-                <p class="ppayslip-p"><strong>ID:</strong> <?= htmlspecialchars($value['employee_id']) ?></p>
-                <p class="ppayslip-p"><strong>Name:</strong> <?= strtoupper(htmlspecialchars($value['last_name'])) ?>, <?= htmlspecialchars($value['first_name']) ?></p>
-            </div>
-            <div>
-                <p class="ppayslip-p"><strong>Position:</strong> <?= htmlspecialchars($value['position']) ?></p>
-                <p class="ppayslip-p"><strong>Status:</strong> <?= htmlspecialchars($value['status']) ?></p>
-            </div>
-        </div>
-
-        <h3 class="ppayslip-h3">Work Details</h3>
-                <table class="ppayslip-table">
-            <tr class="ppayslip-tr">
-                <td class="ppayslip-td"></td>
-                <td class="ppayslip-td">Days/Hours</td>
-                <td class="ppayslip-td">Total</td>
+        <h3>Days / Hours Worked</h3>
+        <table border="1" cellpadding="6" cellspacing="0">
+            <tr>
+                <th>Rate</th>
+                <th>Value</th>
             </tr>
-            </thead>
-            <tbody class="ppayslip-tbody">
-            <?php
-            $categories = [
-                ['Daily Minimum Wage', 'w1_daily_minimum_wage', 'w1'],
-                ['Sunday Rest Day', 'w2_sunday_rest_day', 'w2'],
-                ['Legal Holiday', 'w3_legal_holiday','w3'],
-                ['Special Holiday', 'w4_special_holiday','w4'],
-                ['Regular Overtime', 'w5_regular_overtime_perhour',  'w5'],
-                ['Special Overtime', 'w6_special_overtime_perhour', 'w6'],
-                ['Special Holiday Overtime', 'w7_special_holiday_overtime_perhour','w7'],
-                ['Regular Holiday Overtime', 'w8_regular_holiday_overtime_perhour', 'w8'],
-                ['Cater', 'w9_cater','w9'],
-            ];
-
-            foreach ($categories as [$label, $hourField, $totalField]) {
-                $hours = (float)$value[$hourField];
-                $total = (float)$value[$totalField];
-
-                echo "<tr>
-                    <td>$label</td>
-                    <td><input type='number' name='$hourField' value='$hours' class='hours form-control' data-target='$totalField'></td>
-                    <td><span id='{$totalField}_display'>" . formatCurrency($total) . "</span></td>
-                </tr>";
-            }
-            ?>
-            <tr class="ppayslip-tr">
-                <td class="ppayslip-td"><strong>Gross Pay</strong></td>
-                <td class="ppayslip-td-special" colspan="3"><?= formatCurrency($value['gross_pay']) ?></td>
+            <tr>
+                <td>Daily Minimum Wage Days</td>
+                <td><input type="number" name="num_of_days_for_rate_1" value="<?= h($transactions['num_of_days_for_rate_1'] ?? 0) ?>" min="0"></td>
             </tr>
-            </tbody>
+            <tr>
+                <td>Sunday Rest Day Days</td>
+                <td><input type="number" name="num_of_days_for_rate_2" value="<?= h($transactions['num_of_days_for_rate_2'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Legal Holiday Days</td>
+                <td><input type="number" name="num_of_days_for_rate_3" value="<?= h($transactions['num_of_days_for_rate_3'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Special Holiday Days</td>
+                <td><input type="number" name="num_of_days_for_rate_4" value="<?= h($transactions['num_of_days_for_rate_4'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Regular Overtime Hours</td>
+                <td><input type="number" name="num_of_hours_for_rate_5" value="<?= h($transactions['num_of_hours_for_rate_5'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Special Overtime Hours</td>
+                <td><input type="number" name="num_of_hours_for_rate_6" value="<?= h($transactions['num_of_hours_for_rate_6'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Special Holiday Overtime Hours</td>
+                <td><input type="number" name="num_of_hours_for_rate_7" value="<?= h($transactions['num_of_hours_for_rate_7'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Regular Holiday Overtime Hours</td>
+                <td><input type="number" name="num_of_hours_for_rate_8" value="<?= h($transactions['num_of_hours_for_rate_8'] ?? 0) ?>" min="0"></td>
+            </tr>
+            <tr>
+                <td>Cater Days</td>
+                <td><input type="number" name="num_of_days_for_rate_9" value="<?= h($transactions['num_of_days_for_rate_9'] ?? 0) ?>" min="0"></td>
+            </tr>
         </table>
 
-        <h3 class="ppayslip-h3">Deductions</h3>
-        <table class="ppayslip-table">
-            <tbody class="ppayslip-tbody">
-                <tr class="ppayslip-tr"><td class="ppayslip-td">SSS</td><td><?= formatCurrency($value['sss']) ?></td></tr>
-                <tr class="ppayslip-tr"><td class="ppayslip-td">PhilHealth</td><td><?= formatCurrency($value['philhealth']) ?></td></tr>
-                <tr class="ppayslip-tr"><td class="ppayslip-td">Pag-IBIG</td><td><?= formatCurrency($value['pagibig']) ?></td></tr>
-                <tr class="ppayslip-tr">
-                    <td class="ppayslip-td">Cater Deduction</td>
-                    <td class="ppayslip-td-special"><input type="number" name="cater1" value="<?= $value['cater1'] ?>" class="ppayslip-form-control"></td>
-                </tr>
-                <tr class="ppayslip-tr">
-                    <td class="ppayslip-td">Advance</td>
-                    <td class="ppayslip-td-special"><input type="number" name="advance" value="<?= $value['advance'] ?>" class="ppayslip-form-control"></td>
-                </tr>
-                <tr class="ppayslip-tr"><td class="ppayslip-td">Total Deductions</td> <td class="ppayslip-td"><?= formatCurrency($value['total_deductions']) ?></td></tr>
-                <tr class="ppayslip-tr"><td class="ppayslip-td"><strong>Net Pay</strong></td>
-                <td class="ppayslip-td"><strong class="ppayslip-strong"><?= formatCurrency($value['net_pay']) ?></strong></td>
-                </tr>
-            </tbody>
-        </table>
+        <h3>Deductions</h3>
+        <label>Cater Deductions:
+            <input type="number" step="0.01" name="cater_deductions" value="<?= h($transactions['cater_deductions'] ?? 0) ?>">
+        </label><br>
+        <label>Advance Deductions:
+            <input type="number" step="0.01" name="advance_deductions" value="<?= h($transactions['advance_deductions'] ?? 0) ?>">
+        </label><br><br>
 
-        <br>
-        <button type="submit" class="ppayslip-save_btn">Save Changes</button>
+        <button type="submit">Save Changes</button>
+        <a href="../php/dashboard.php">Cancel</a>
     </form>
 </div>
+</body>
+</html>
