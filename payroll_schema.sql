@@ -1,140 +1,79 @@
-CREATE TABLE employee_info_and_rates (
-    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+-- CREATION OF EMPLOYEE INFO TABLE
+CREATE TABLE IF NOT EXISTS employee_info (
+    employee_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     last_name VARCHAR(20) NOT NULL,
     first_name VARCHAR(20) NOT NULL,
     position VARCHAR(100) NOT NULL,
     status ENUM('Permanent', 'On-Call') NOT NULL,
-    board_lodging ENUM('Yes', 'No') NOT NULL DEFAULT 'No',
     lodging_address VARCHAR(255) DEFAULT NULL,
-    food_allowance ENUM('Full', 'Partial', 'None') NOT NULL DEFAULT 'Full',
-    rate_1_daily_minimum_wage DECIMAL(10, 2) DEFAULT 470.00,
-    rate_2_sunday_rest_day DECIMAL(10, 2) DEFAULT 611.00,
-    rate_3_legal_holiday DECIMAL(10, 2) DEFAULT 940.00,
-    rate_4_special_holiday DECIMAL(10, 2) DEFAULT 611.00,
-    rate_5_regular_overtime_perhour DECIMAL(10, 2) DEFAULT 73.44,
-    rate_6_special_overtime_perhour DECIMAL(10, 2) DEFAULT 76.38,
-    rate_7_special_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 99.29,
-    rate_8_regular_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 152.75,
-    rate_9_cater DECIMAL(10, 2) DEFAULT 1000.00
+    board_lodging ENUM('Yes', 'No') NOT NULL,
+    food_allowance ENUM('Full', 'Partial', 'None') NOT NULL DEFAULT 'Full'
 );
 
-CREATE TABLE payroll_dates (
-    payroll_id INT AUTO_INCREMENT PRIMARY KEY,
-    week VARCHAR(50) NOT NULL
-);
-
-INSERT INTO payroll_dates (week) VALUES
-('January 1 - 15'),
-('January 16 - 31'),
-('February 1 - 15'),
-('February 16 - 29'),
-('March 1 - 15'),
-('March 16 - 31'),
-('April 1 - 15'),
-('April 16 - 30'),
-('May 1 - 15'),
-('May 16 - 31'),
-('June 1 - 15'),
-('June 16 - 30'),
-('July 1 - 15'),
-('July 16 - 31'),
-('August 1 - 15'),
-('August 16 - 31'),
-('September 1 - 15'),
-('September 16 - 30'),
-('October 1 - 15'),
-('October 16 - 31'),
-('November 1 - 15'),
-('November 16 - 30'),
-('December 1 - 15'),
-('December 16 - 31');
-
-CREATE TABLE payroll_transactions (
-    year INT NOT NULL,  -- stores the chosen year
-    payroll_id INT NOT NULL,
-    employee_id INT NOT NULL,
-    num_of_days_for_rate_1 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_2 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_3 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_4 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_5 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_6 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_7 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_8 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_9 INT UNSIGNED DEFAULT 0,
-    cater_deductions DECIMAL(10,2) DEFAULT 0.00,
-    advance_deductions DECIMAL(10,2) DEFAULT 0.00,
-
-    FOREIGN KEY (employee_id) REFERENCES employee_info_and_rates (employee_id),
-    FOREIGN KEY (payroll_id) REFERENCES payroll_dates (payroll_id),
-
-    PRIMARY KEY (year, payroll_id, employee_id) -- composite key
-);
-
-CREATE TABLE archived_employees (
-    year INT NOT NULL,  -- stores the chosen year
-    employee_id INT PRIMARY KEY,    
-    payroll_id INT,
-    last_name VARCHAR(20) NOT NULL,
-    first_name VARCHAR(20) NOT NULL,
-    position VARCHAR(100) NOT NULL,
-    status ENUM('Permanent', 'On-Call') NOT NULL,
-    board_lodging ENUM('Yes', 'No') NOT NULL DEFAULT 'No',
-    lodging_address VARCHAR(255) DEFAULT NULL,
-    food_allowance ENUM('Full', 'Partial', 'None') NOT NULL DEFAULT 'Full',
-    rate_1_daily_minimum_wage DECIMAL(10, 2) DEFAULT 470.00,
-    rate_2_sunday_rest_day DECIMAL(10, 2) DEFAULT 611.00,
-    rate_3_legal_holiday DECIMAL(10, 2) DEFAULT 940.00,
-    rate_4_special_holiday DECIMAL(10, 2) DEFAULT 611.00,
-    rate_5_regular_overtime_perhour DECIMAL(10, 2) DEFAULT 73.44,
-    rate_6_special_overtime_perhour DECIMAL(10, 2) DEFAULT 76.38,
-    rate_7_special_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 99.29,
-    rate_8_regular_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 152.75,
-    rate_9_cater DECIMAL(10, 2) DEFAULT 1000.00,
-    num_of_days_for_rate_1 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_2 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_3 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_4 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_5 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_6 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_7 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_8 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_9 INT UNSIGNED DEFAULT 0,
-    cater_deductions DECIMAL(10,2) DEFAULT 0.00,
-    advance_deductions DECIMAL(10,2) DEFAULT 0.00,
-    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE payslip_history (
-    year INT NOT NULL,  -- stores the chosen year
-    employee_id INT PRIMARY KEY,    
-    payroll_id INT,
-    last_name VARCHAR(20) NOT NULL,
-    first_name VARCHAR(20) NOT NULL,
-    position VARCHAR(100) NOT NULL,
-    status ENUM('Permanent', 'On-Call') NOT NULL,
-    board_lodging ENUM('Yes', 'No') NOT NULL DEFAULT 'No',
-    lodging_address VARCHAR(255) DEFAULT NULL,
-    food_allowance ENUM('Full', 'Partial', 'None') NOT NULL DEFAULT 'Full',
-    rate_1_daily_minimum_wage DECIMAL(10, 2) DEFAULT 470.00,
-    rate_2_sunday_rest_day DECIMAL(10, 2) DEFAULT 611.00,
-    rate_3_legal_holiday DECIMAL(10, 2) DEFAULT 940.00,
-    rate_4_special_holiday DECIMAL(10, 2) DEFAULT 611.00,
-    rate_5_regular_overtime_perhour DECIMAL(10, 2) DEFAULT 73.44,
-    rate_6_special_overtime_perhour DECIMAL(10, 2) DEFAULT 76.38,
-    rate_7_special_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 99.29,
-    rate_8_regular_holiday_overtime_perhour DECIMAL(10, 2) DEFAULT 152.75,
-    rate_9_cater DECIMAL(10, 2) DEFAULT 1000.00,
-    num_of_days_for_rate_1 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_2 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_3 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_4 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_5 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_6 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_7 INT UNSIGNED DEFAULT 0,
-    num_of_hours_for_rate_8 INT UNSIGNED DEFAULT 0,
-    num_of_days_for_rate_9 INT UNSIGNED DEFAULT 0,
-    cater_deductions DECIMAL(10,2) DEFAULT 0.00,
-    advance_deductions DECIMAL(10,2) DEFAULT 0.00
+-- CREATION OF EMPLOYEE PAYROLL TABLE
+CREATE TABLE IF NOT EXISTS employee_payroll (
+    payroll_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT UNSIGNED NOT NULL,
     
+    w1_daily_minimum_wage INT DEFAULT 0,
+    w2_sunday_rest_day INT DEFAULT 0,
+    w3_legal_holiday INT DEFAULT 0,
+    w4_special_holiday INT DEFAULT 0,
+    w5_regular_overtime_perhour INT DEFAULT 0,
+    w6_special_overtime_perhour INT DEFAULT 0,
+    w7_special_holiday_overtime_perhour INT DEFAULT 0,
+    w8_regular_holiday_overtime_perhour INT DEFAULT 0,
+    w9_cater INT DEFAULT 0,
+
+    CONSTRAINT fk_employee
+        FOREIGN KEY (employee_id) REFERENCES employee_info(employee_id)
+        ON DELETE CASCADE
+);
+
+-- CREATION OF PAYROLL COMPUTATION TABLE
+CREATE TABLE IF NOT EXISTS payroll_computation (
+    computation_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    payroll_id INT UNSIGNED NOT NULL,
+    employee_id INT UNSIGNED NOT NULL,
+
+    -- product of 'entered days/hours from employee_payroll' and 'entered values from the form'
+    w1 DECIMAL(10,2) DEFAULT 0.00,
+    w2 DECIMAL(10,2) DEFAULT 0.00,
+    w3 DECIMAL(10,2) DEFAULT 0.00,
+    w4 DECIMAL(10,2) DEFAULT 0.00,
+    w5 DECIMAL(10,2) DEFAULT 0.00,
+    w6 DECIMAL(10,2) DEFAULT 0.00,
+    w7 DECIMAL(10,2) DEFAULT 0.00,
+    w8 DECIMAL(10,2) DEFAULT 0.00,
+    w9 DECIMAL(10,2) DEFAULT 0.00,
+
+    -- gross pay formula
+    gross_pay DECIMAL(10,2) GENERATED ALWAYS AS (
+        w1 + w2 + w3 + w4 + w5 + w6 + w7 + w8 + w9
+    ) STORED,
+
+    -- deductions
+    sss DECIMAL(10,2) GENERATED ALWAYS AS (0.05 * gross_pay) STORED,
+    philhealth DECIMAL(10,2) GENERATED ALWAYS AS (0.025 * gross_pay) STORED,
+    pagibig DECIMAL(10,2) GENERATED ALWAYS AS (0.02 * gross_pay) STORED,
+    cater1 DECIMAL(10,2) DEFAULT 0.00,
+    advance DECIMAL(10,2) DEFAULT 0.00,
+
+    -- total deductions formula
+    total_deductions DECIMAL(10,2) GENERATED ALWAYS AS (
+        sss + philhealth + pagibig + cater1 + advance
+    ) STORED,
+    
+    -- net pay formula
+    net_pay DECIMAL(10,2) GENERATED ALWAYS AS (
+        gross_pay - total_deductions
+    ) STORED,
+
+    CONSTRAINT fk_computation_employee FOREIGN KEY (employee_id)
+        REFERENCES employee_info(employee_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_computation_payroll FOREIGN KEY (payroll_id)
+        REFERENCES employee_payroll(payroll_id)
+        ON DELETE CASCADE
 );

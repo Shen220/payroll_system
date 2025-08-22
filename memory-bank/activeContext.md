@@ -19,7 +19,8 @@ Implementing new features for employee data management, specifically adding an h
     - **Git Ownership fixed:** Added project directory to Git's safe list (`git config --global --add safe.directory C:/xampp/htdocs/payroll_system`).
     - **`composer.json` created:** Added `composer.json` with `phpoffice/phpspreadsheet` dependency.
     - **Persistent Composer Installation Failure:** Despite numerous attempts, `php composer.phar install` and `php composer.phar update` consistently reported "Nothing to install, update or remove" and failed to create the `vendor` directory, indicating a deep environmental/permissions issue preventing file writes.
-    - **Decision for Manual Installation:** Due to Composer's inability to install files, a manual installation of PhpSpreadsheet and its core dependencies has been initiated.
+- **Decision for Manual Installation:** Due to Composer's inability to install files, a manual installation of PhpSpreadsheet and its core dependencies has been initiated.
+- **Added "Archive" button to dashboard:** Added an archive button to the dashboard header.
 
 ## Next Steps
 - **Complete Manual PhpSpreadsheet Installation:** User is currently in the process of manually creating the `vendor` directory structure, downloading PhpSpreadsheet and its dependencies, and placing them in the correct locations.
@@ -32,3 +33,4 @@ Implementing new features for employee data management, specifically adding an h
     - `philhealth_deduction` (e.g., `DECIMAL(10,2)`)
 - **Display Deductions:** Update `php/dashboard.php` or `php/payslip.php` to display the newly calculated deductions.
 - **Edit Functionality:** Update `php/edit.php` to handle the new `hour_rate` and calculated deductions.
+- **Copied CSS to archive.css:** Copied relevant CSS styles from `dashboard.css` to `archive.css`, including styles for `#header_container`.

@@ -29,13 +29,16 @@ $message = $data['message'];
         <?php endfor; ?>
     </select><br><br>
 
-    <label>Payroll Period:</label>
-    <select name="payroll_id" required>
-        <option value="">-- Select Payroll Period --</option>
-        <?php while($row=$payroll_result->fetch_assoc()): ?>
-            <option value="<?= htmlspecialchars($row['payroll_id']) ?>"><?= htmlspecialchars($row['week']) ?></option>
-        <?php endwhile; ?>
-    </select><br><br>
+   <label>Payroll Period:</label>
+<select name="payroll_id" id="payrollPeriod" required>
+    <option value="">-- Select Payroll Period --</option>
+    <?php while($row=$payroll_result->fetch_assoc()): ?>
+        <option value="<?= htmlspecialchars($row['payroll_id']) ?>">
+            <?= htmlspecialchars($row['week']) ?>
+        </option>
+    <?php endwhile; ?>
+</select>
+<br><br>
 
 <?php foreach ($rate_labels as $name => $data): 
     $rate_key = $data['key'];
@@ -60,19 +63,36 @@ $message = $data['message'];
     <span id="total_amount">0.00</span>
 </div>
 
+
 <div>
-  <h4>DEDUCTIONS:</h4>
-  <p>SSS (5%): <span id="sss">0.00</span></p>
-  <p>Pagibig (2%): <span id="pagibig">0.00</span></p>
-  <p>PhilHealth (2.5%): <span id="philhealth">0.00</span></p>
-<input type="number" name="cater_deductions"  value="<?= htmlspecialchars($_POST['cater_deductions'] ?? 0) ?>">
-<input type="number" name="advance_deductions"  value="<?= htmlspecialchars($_POST['advance_deductions'] ?? 0) ?>">
-  <p><strong>Total Deductions:</strong> <span id="total_deductions">0.00</span></p>
+    <label><strong>DEDUCTIONS:</strong></label>
+
+    <!-- wrap the auto (gov) deductions -->
+<div id="govDeductions">
+    <label><strong>DEDUCTIONS:</strong></label><br>
+    SSS: <span id="sss">0.00</span><br>
+    Pagibig: <span id="pagibig">0.00</span><br>
+    PhilHealth: <span id="philhealth">0.00</span><br>
+</div>
+
+    Cater: <input type="number" id="cater_deductions" name="cater_deductions" value="0"><br>
+    Advance: <input type="number" id="advance_deductions" name="advance_deductions" value="0"><br>
+
+    <strong>Total Deductions: <span id="total_deductions">0.00</span></strong>
 </div>
 
 <div>
-  <label><strong>NET PAY:</strong></label>
-  <span id="net_pay">0.00</span>
+    <label><strong>NET PAY:</strong></label>
+    <span id="net_pay">0.00</span>
+</div>
+
+<!-- Hidden inputs to send computed values to PHP -->
+<input type="hidden" id="hidden_total_amount" name="total_amount">
+<input type="hidden" id="hidden_sss" name="sss">
+<input type="hidden" id="hidden_pagibig" name="pagibig">
+<input type="hidden" id="hidden_philhealth" name="philhealth">
+<input type="hidden" id="hidden_total_deductions" name="total_deductions">
+<input type="hidden" id="hidden_net_pay" name="net_pay">
 </div>
 
 

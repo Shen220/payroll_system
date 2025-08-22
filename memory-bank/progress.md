@@ -9,6 +9,7 @@
 - **Login/Logout:** Basic authentication system.
 - **Dashboard UI Improvements:** `btn_actions` are now positioned on the far right with adjusted margin. "Edit" and "Delete" links in the table are styled as buttons with thinner borders, normal font weight, a gap between them (removing the "|"), and consistent width.
 - **Add Page UI Improvements:** The "Back" button is positioned on the edge of the main container, "Add New Employee" is centered, and the "Add Employee" button has the same width as the main container.
+- **Added Archive Button:** Added an archive button to the dashboard header.
 
 ## What's Left to Build
 - **Database Schema Update:** Crucial step to add `hour_rate`, `sss_deduction`, `pagibig_deduction`, and `philhealth_deduction` columns to the `employee_info` table.

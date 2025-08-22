@@ -281,63 +281,107 @@ document.getElementById("selectAllPayslips").addEventListener("change", updateGe
 updateGenerateButtonVisibility();
 
 function attachLiveComputation(container) {
+    // Display spans
     const totalAmountSpan = document.getElementById("total_amount");
     const sssSpan = document.getElementById("sss");
     const pagibigSpan = document.getElementById("pagibig");
     const philhealthSpan = document.getElementById("philhealth");
-    const caterInput = document.getElementById("cater_deductions");
-    const advanceInput = document.getElementById("advance_deductions");
     const totalDeductionsSpan = document.getElementById("total_deductions");
     const netPaySpan = document.getElementById("net_pay");
 
+    // Manual deduction inputs
+    const caterInput = document.getElementById("cater_deductions");
+    const advanceInput = document.getElementById("advance_deductions");
+
+    // Hidden inputs (for form submit)
+    const totalAmountHidden = document.getElementById("hidden_total_amount");
+    const sssHidden = document.getElementById("hidden_sss");
+    const pagibigHidden = document.getElementById("hidden_pagibig");
+    const philhealthHidden = document.getElementById("hidden_philhealth");
+    const totalDeductionsHidden = document.getElementById("hidden_total_deductions");
+    const netPayHidden = document.getElementById("hidden_net_pay");
+
+    // Payroll select + gov block
+    const payrollSelect = document.getElementById("payrollPeriod") ||
+                          container.querySelector('select[name="payroll_id"]');
+    const govDeductionsBlock = document.getElementById("govDeductions");
+
+    // --- Helpers ---
+    function isSecondCutoff() {
+        if (!payrollSelect) return false;
+        const txt = payrollSelect.options[payrollSelect.selectedIndex]?.text || "";
+        return /\(\s*2\s*\)/.test(txt); // match "(2)" even with spaces
+    }
+
+    function toggleGovVisibility(hide) {
+        if (govDeductionsBlock) {
+            govDeductionsBlock.classList.toggle("hidden", hide);
+        }
+    }
+
+    // --- Main computation ---
     function updateTotal() {
         let total = 0;
+
+        // compute gross
         container.querySelectorAll("input[data-multiplier]").forEach(input => {
             const multiplier = parseFloat(input.dataset.multiplier) || 0;
             const value = parseFloat(input.value) || 0;
             total += value * multiplier;
         });
-         // Show Gross Pay
-        totalAmountSpan.textContent = total.toFixed(2)
-           // Compute percentage deductions
-        let sss = total * 0.05;        // 5%
-        let pagibig = total * 0.02;    // 2%
-        let philhealth = total * 0.025; // 2.5%
 
-        // Get manual deductions
-        let cater = parseFloat(caterInput.value) || 0;
-        let advance = parseFloat(advanceInput.value) || 0;
+        totalAmountSpan.textContent = total.toFixed(2);
+        if (totalAmountHidden) totalAmountHidden.value = total.toFixed(2);
 
-        // Total deductions (percentage + manual)
-        let totalDeductions = sss + pagibig + philhealth + cater + advance;
+        const secondHalf = isSecondCutoff();
+        toggleGovVisibility(secondHalf);
 
+        // government deductions (0 in second cutoff)
+        const sss = secondHalf ? 0 : total * 0.05;
+        const pagibig = secondHalf ? 0 : total * 0.02;
+        const philhealth = secondHalf ? 0 : total * 0.025;
 
-        // Show deductions
+        // manual deductions
+        const cater = parseFloat(caterInput?.value) || 0;
+        const advance = parseFloat(advanceInput?.value) || 0;
+
+        // total deductions
+        const totalDeductions = sss + pagibig + philhealth + cater + advance;
+
+        // update UI
         sssSpan.textContent = sss.toFixed(2);
         pagibigSpan.textContent = pagibig.toFixed(2);
         philhealthSpan.textContent = philhealth.toFixed(2);
-        totalDeductionsSpan.textContent = totalDeductions.toFixed(2);  
+        totalDeductionsSpan.textContent = totalDeductions.toFixed(2);
 
-        // Compute Net Pay
-        let netPay = total - totalDeductions;
+        // sync hidden inputs
+        if (sssHidden) sssHidden.value = sss.toFixed(2);
+        if (pagibigHidden) pagibigHidden.value = pagibig.toFixed(2);
+        if (philhealthHidden) philhealthHidden.value = philhealth.toFixed(2);
+        if (totalDeductionsHidden) totalDeductionsHidden.value = totalDeductions.toFixed(2);
+
+        // net pay
+        const netPay = total - totalDeductions;
         netPaySpan.textContent = netPay.toFixed(2);
+        if (netPayHidden) netPayHidden.value = netPay.toFixed(2);
     }
-  // attach listeners for computed fields
+
+    // --- Event listeners ---
     container.querySelectorAll("input[data-multiplier]").forEach(input => {
         const multiplier = parseFloat(input.dataset.multiplier) || 0;
         const resultSpan = container.querySelector("#result_" + input.id.split("input_")[1]);
 
         input.addEventListener("input", () => {
-            let value = parseFloat(input.value) || 0;
-            let product = value * multiplier;
-            resultSpan.textContent = product.toFixed(2);
+            const value = parseFloat(input.value) || 0;
+            resultSpan.textContent = (value * multiplier).toFixed(2);
             updateTotal();
         });
     });
 
-    // attach listeners for manual deductions
-    caterInput.addEventListener("input", updateTotal);
-    advanceInput.addEventListener("input", updateTotal);
+    if (caterInput) caterInput.addEventListener("input", updateTotal);
+    if (advanceInput) advanceInput.addEventListener("input", updateTotal);
+    if (payrollSelect) payrollSelect.addEventListener("change", updateTotal);
 
-    updateTotal(); // run once on load
+    // initial run
+    updateTotal();
 }
