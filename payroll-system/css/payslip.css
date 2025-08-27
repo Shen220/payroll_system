@@ -1,0 +1,234 @@
+.ppayslip-form {
+  font-family: Arial, sans-serif;
+  margin-top: 10px;
+  font-family: Montserrat, sans-serif;
+}
+
+.ppayslip-container {
+  max-width: 700px;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 30px;
+  border-radius: 8px;
+} 
+
+.ppayslip-basic_info {
+  display: flex;
+  justify-content: center;
+  gap: 150px;
+}
+
+.ppayslip-first {
+  display: flex;
+  flex-direction: column;
+  height: 70px;
+}
+
+.ppayslip-second {
+  display: flex;
+  flex-direction: column;
+  height: 70px;
+}
+
+.ppayslip-info{
+  margin-bottom: -5px;
+}
+
+.ppayslip-button {
+  font-family: Montserrat, sans-serif;
+}
+
+.ppayslip-h2 {
+  text-align: center;
+  font-family: Montserrat, sans-serif;
+  margin-top: -10px;
+}
+
+.ppayslip-restaurant{
+  margin-top: -5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ppayslip-text {
+  font-weight: 400;
+  font-size: medium;
+  margin-bottom: 10px;
+}
+
+.ppayslip-h3 {
+  margin-top: -10px;
+  margin-bottom: -40px;
+  color: #222;
+  font-size: large;
+}
+
+.ppayslip-h3-special {
+  margin-top: 10px;
+  margin-bottom: -40px;
+  color: #222;
+  font-size: large;
+}
+
+.ppayslip-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: Montserrat, sans-serif;
+}
+
+.ppayslip-td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 1rem;
+  color: #333;
+}
+
+.ppayslip-td:first-child {
+  font-weight: 500;
+  width: 50%;
+}
+
+.ppayslip-tr:last-child td {
+  background-color: #f9f9f9;
+  color: #111;
+}
+
+.ppayslip-total {
+  font-weight: bold;
+  font-family: Montserrat, sans-serif;
+}
+
+.ppayslip-allowance_box {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.ppayslip-allowance_box p {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin: 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+}
+
+.ppayslip-allowance_box p:last-child {
+  border-bottom: none;
+}
+
+@media print {
+  /* Hide everything */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show the modal and its contents */
+  .modal, 
+  .modal * {
+    visibility: visible;
+  }
+
+  /* Make modal take the whole printed page */
+  .modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* Force modal-dialog to use full width */
+  .modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Force modal-content to use full width */
+  .modal-content {
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide the dark overlay behind the modal */
+  .modal-backdrop {
+    display: none !important;
+  }
+
+@media print {
+  /* Hide everything */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show the modal and its contents */
+  .modal, 
+  .modal * {
+    visibility: visible;
+  }
+
+  /* Make modal take the whole printed page */
+  .modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100%  !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* Force modal-dialog to use full width */
+  .modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Force modal-content to use full width */
+  .modal-content {
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide the dark overlay behind the modal */
+  .modal-backdrop {
+    display: none !important;
+    visibility: hidden !important;
+    background: none !important;
+  }
+
+  /* Hide UI elements you don’t want in print */
+  #back,
+  #ppayslip-print,
+  .modal-title,
+  .btn-close {
+    display: none !important;
+  }
+
+  /* Force all text to black */
+  h2, h3, td, .ppayslip-info {
+    color: black !important;
+  }
+}
+}
