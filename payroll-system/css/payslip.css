@@ -1,0 +1,223 @@
+tr {
+  background-color: transparent !important; /* remove row shading */
+}
+
+tr:hover {
+  background-color: transparent !important; /* remove hover shading */
+}
+
+
+.payslip-details{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: -50px;
+}
+
+.payslip-details .payslip-sub-details{
+  display: flex;
+  gap: 80px;
+}
+
+.payslip-text-red{
+  color: red;
+  font-weight: 600;
+}
+
+.payslip-details .payslip-sub-details-pp{
+  margin-left: -545px;
+}
+
+.payslip-p-special{
+  margin-bottom: -6px;
+  color: #0614fb;
+  font-weight: 600;
+}
+
+.payslip-p-ordinary{
+  margin-bottom: -6px;
+}
+
+.payslip-thead-special .payslip-th-red{
+  background-color: white;
+  color: red;
+  font-weight: 600;
+
+}
+
+.payslip-thead-special .payslip-th{
+  background-color: white;
+  color: black;
+}
+
+.payslip-table, .payslip-table-total {
+    border: none;          /* remove outer border */
+    border-collapse: collapse;  /* cleaner look */
+    width: 100%;           /* full width (or set px/em/% as needed) */
+}
+
+.payslip-table-total th, .payslip-table-total td {
+    border: none;          /* remove inner borders */
+    padding: 0px;          /* spacing inside cells */
+}
+
+.payslip-table th, .payslip-table td {
+    border: none;          /* remove inner borders */
+    padding: 0px;          /* spacing inside cells */
+}
+
+.payslip-td-column-one{
+  text-align: left;
+}
+
+.payslip-tr-second td:last-child{
+  text-align: right;
+  padding-right: 35px;
+}
+
+.payslip-tr-special .payslip-th:first-child{
+  color: black;
+  text-align: left;
+}
+
+/* Scope all styles to the payslip modal only */
+#editPayslipModal .payslip-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#editPayslipModal .payslip-td {
+  text-align: center;
+}
+
+#editPayslipModal .total-row {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+#editPayslipModal .message-success {
+  color: green;
+  font-weight: bold;
+}
+
+.payslip-table-total{
+  margin-top: 10px;
+}
+
+.payslip-table-totally{
+  margin-top: 40px;
+}
+
+.total-row .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row .payslip-td:last-child{
+  text-align: right;
+  padding-right: 25px;
+  text-decoration: underline;
+}
+
+.total-row-red .payslip-td:first-child{
+  text-align: left;
+  color: red;
+  font-weight: 600;
+}
+
+.total-row-red .payslip-td:last-child{
+  text-align: right;
+  padding-right: 25px;
+  text-decoration: double underline;
+  color: red;
+  font-weight: 600;
+}
+
+.total-row-underline .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row-underline .payslip-td:last-child{
+  text-align: right;
+  padding-right: 25px;
+  text-decoration: double underline;
+}
+
+.total-row-special .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row-special .payslip-td:last-child{
+  text-align: right;
+  padding-right: 25px;
+}
+
+.broken-line {
+    border: none;                 /* remove default HR */
+    border-top: 2px dashed #000;  /* broken (dashed) line */
+    margin: 15px 0;               /* space above and below */
+}
+
+
+
+@media print {
+  /* Hide everything */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show the modal and its contents */
+  .modal, 
+  .modal * {
+    visibility: visible;
+  }
+
+  /* Make modal take the whole printed page */
+  .modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100%  !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* Force modal-dialog to use full width */
+  .modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Force modal-content to use full width */
+  .modal-content {
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide the dark overlay behind the modal */
+  .modal-backdrop {
+    display: none !important;
+    visibility: hidden !important;
+    background: none !important;
+  }
+
+  /* Hide UI elements you don’t want in print */
+  #back,
+  #ppayslip-print,
+  .modal-title,
+  .btn-close {
+    display: none !important;
+  }
+
+  /* Force all text to black */
+  h2, h3, td, .ppayslip-info {
+    color: black !important;
+  }
+}
+}

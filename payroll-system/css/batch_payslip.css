@@ -1,0 +1,161 @@
+body{
+  font-family: Montserrat, sans-serif;
+}
+
+@media print {
+  .payslip {
+    page-break-inside: avoid;  /* older browsers */
+    break-inside: avoid;       /* modern browsers */
+  }
+}
+
+.payslip {
+  margin: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.payslip-details{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: -50px;
+}
+
+.payslip-details .payslip-sub-details{
+  display: flex;
+  gap: 80px;
+}
+
+.payslip-details .payslip-sub-details-special{
+  display: flex;
+  margin-left: 125px;
+}
+
+.payslip-sub-details-special p{
+  color: red;
+  font-weight: 600;
+}
+
+.payslip-details .payslip-sub-details-pp{
+  margin-left: -460px;
+}
+
+.payslip-p-special{
+  margin-bottom: -6px;
+  color: #0614fb;
+  font-weight: 600;
+}
+
+.payslip-thead-special .payslip-th{
+  background-color: white;
+  color: red;
+  font-weight: 600;
+}
+
+.payslip-table, .payslip-table-total {
+    border: none;          /* remove outer border */
+    border-collapse: collapse;  /* cleaner look */
+    width: 100%;           /* full width (or set px/em/% as needed) */
+}
+
+.payslip-table-total th, .payslip-table-total td {
+    border: none;          /* remove inner borders */
+    padding: 0px;          /* spacing inside cells */
+}
+
+.payslip-table th, .payslip-table td {
+    border: none;          /* remove inner borders */
+    padding: 0px;          /* spacing inside cells */
+}
+
+.payslip-td-column-one{
+  text-align: left;
+}
+
+.payslip-tr-second td:last-child{
+  text-align: right;
+  padding-right: 15px;
+}
+
+.payslip-tr-special .payslip-th:first-child{
+  color: black;
+  text-align: left;
+}
+
+.payslip-tr-center td:first-child{
+  text-align: left;
+}
+
+.payslip-tr-center td{
+  text-align: center;
+}
+
+/* Scope all styles to the payslip modal only */
+#editPayslipModal .payslip-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#editPayslipModal .payslip-td {
+  text-align: center;
+}
+
+#editPayslipModal .total-row {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+#editPayslipModal .message-success {
+  color: green;
+  font-weight: bold;
+}
+
+.payslip-table-total{
+  margin-top: 10px;
+}
+
+.payslip-table-totally{
+  margin-top: 40px;
+}
+
+.total-row .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row .payslip-td:last-child{
+  text-align: right;
+  padding-right: 15px;
+  text-decoration: double underline;
+}
+
+.total-row-special .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row-special .payslip-td:last-child{
+  text-align: right;
+  padding-right: 15px;
+}
+
+.total-row-red td{
+  color: red;
+  font-weight: 600;
+}
+
+.total-row-red .payslip-td:first-child{
+  text-align: left;
+}
+
+.total-row-red .payslip-td:last-child{
+  text-align: right;
+  padding-right: 15px;
+  text-decoration: double underline;
+}
+
+.broken-line {
+    border: none;                 /* remove default HR */
+    width: 100%;
+    border-top: 2px dashed #000;  /* broken (dashed) line */
+    margin: 15px 0;               /* space above and below */
+}
